@@ -3,6 +3,9 @@ from .models import Product, Commande
 from django.core.paginator import Paginator
 
 # Create your views here.
+def home(request):
+    return render(request, 'shop/home.html')
+
 def index(request):
     product_object = Product.objects.all()
     item_name = request.GET.get('item-name')
@@ -30,9 +33,8 @@ def checkout(request):
         com = Commande(items=items,total=total, nom=nom, email=email, address=address, ville=ville, pays=pays, zipcode=zipcode)
         com.save()
         return redirect('confirmation')
-
-
     return render(request, 'shop/checkout.html') 
+
 
 def confimation(request):
     info = Commande.objects.all()[:1]

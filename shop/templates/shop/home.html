@@ -1,0 +1,19 @@
+{% extends "shop/base.html" %}
+{% load static %}
+{% block content %}
+<h1 class="text-center my-4">Bienvenue aux Jeux olympiques de 2024</h1>
+{{ request.get_full_path }}
+<p>
+  Les Jeux Olympiques de 2024 se tiendront à Paris, 
+  marquant le grand retour de cet événement sportif prestigieux en France, 
+  un siècle après les derniers jeux parisiens de 1924. Ces jeux célébreront l'excellence, 
+  l'inclusion et l'innovation, avec des compétitions dans des lieux emblématiques 
+  comme la Tour Eiffel et le Grand Palais. Pour la première fois, des sports comme 
+  le breakdance feront leur apparition, reflétant l’évolution des pratiques sportives 
+  contemporaines. Ces Jeux seront un moment de célébration mondiale, 
+  réunissant des athlètes de tous horizons dans un esprit de paix et de fraternité.
+</p>
+
+<img src="{% static 'jo2024-cover.jpg' %}" class="w-100" />
+
+{% endblock %}

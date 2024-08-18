@@ -4,7 +4,7 @@
 
     <div class="row">
         <div class="col-md-12">
-            <form class="card card-sm">
+            <form class="">
                 <div class="card-body row no-gutters align-items-center">
                     <div class="col">
                         <input type="search" placeholder="Entrez le nom du produit que vous cherchez" name="item-name" class="form-control form-control-borderless">
@@ -33,6 +33,8 @@
         {% endfor %}
     </div>
 
+    
+
     <div class="row mt-3">
         <div class="col-md-3 offset-md-4">
             <ul class="pagination">
@@ -60,12 +62,13 @@
 
 {% block js %}
     <script type="text/javascript">
-        console.log('Juste pour tester ');
+
         if(localStorage.getItem('panier') == null){
             var panier = {};
         }else{
             panier = JSON.parse(localStorage.getItem('panier'));
         }
+
         $(document).on('click', '.ted', function(){
             console.log('ajouter');
             var item_id = this.id.toString();
@@ -83,9 +86,9 @@
             }
             console.log(panier);
             localStorage.setItem('panier', JSON.stringify(panier));
-            document.getElementById("panier").innerHTML ="Panier("+ Object.keys(panier).length+")";
-            
+            document.getElementById("panier").innerHTML ="Panier("+ Object.keys(panier).length+")";  
         });
+
         AfficherList(panier);
         function AfficherList(panier){
             var panierString = " ";
@@ -96,10 +99,16 @@
                 panierString += document.getElementById("aa"+x).innerHTML + " Qte: "+ panier[x][0] + "</br>";
                 index +=1;
             }
-            panierString += "<a href='/checkout' class='btn btn-primary'>Checkout</a>";
+            panierString += "<a href='/checkout' class='btn btn-primary'>Voir</a>";
+            panierString += "<button id='remove_backet' class='btn btn-danger ms-2'>Supprimer</button>";
             $('[data-toggle="popover"]').popover();
             document.getElementById('panier').setAttribute('data-content', panierString);
         }
+
+        $(document).on("click", "#remove_backet", function(){
+            localStorage.removeItem("panier");
+            window.location.reload();
+        });
 
     </script>
 
