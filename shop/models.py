@@ -1,6 +1,7 @@
 from django.db import models
 from django.db.models.fields.related import ForeignKey
 
+
 # Create your models here.
 class Category(models.Model):
     name = models.CharField(max_length=200)
@@ -10,7 +11,7 @@ class Category(models.Model):
         ordering = ['-date_added']
     def __str__(self):
         return self.name    
-
+    
 
 class Product(models.Model):
     title = models.CharField(max_length=200)
@@ -23,7 +24,19 @@ class Product(models.Model):
         ordering = ['-date_added']  
 
     def __str__(self):
-        return self.title           
+        return self.title  
+
+
+    
+class User(models.Model):
+    nom = models.CharField(max_length=50)
+    prenom = models.CharField(max_length=50)
+    email = models.CharField(max_length=50)
+    password = models.CharField(max_length=50)
+    key_generates = models.CharField(max_length=100, blank=True)
+    # products = models.ManyToManyField(Product, verbose_name="products")
+
+         
 
 class Commande(models.Model):
     items = models.CharField(max_length=300)

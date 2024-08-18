@@ -1,13 +1,14 @@
 from django.urls import path
-from shop.views import home, index, detail, checkout, confimation
+from shop.views import home, index, detail, checkout, confimation, create_account_user
 from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
     path('', home, name='home'),
     path('billeterie/', index, name='index'),
-    path('<int:myid>', detail, name="detail"),
-    path('checkout', checkout, name="checkout"),
-    path('confirmation', confimation, name="confirmation" ),
+    path('billeterie/<int:myid>', detail, name="detail"),
+    path('billeterie/checkout', checkout, name="checkout"),
+    path('billeterie/confirmation', confimation, name="confirmation" ),
+    path('billeterie/creation_compte', create_account_user, name="creation_compte" ),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

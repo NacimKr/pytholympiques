@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Product, Commande
+from .models import Category, Product, Commande, User
 
 # Register your models here.
 admin.site.site_header = "Billeterie Jeux Olympiques 2024"
@@ -20,3 +20,4 @@ class AdminCommande(admin.ModelAdmin):
 admin.site.register(Product, AdminProduct)
 admin.site.register(Category, AdminCategorie)
 admin.site.register(Commande, AdminCommande)
+admin.site.register(User)

@@ -1,0 +1,20 @@
+{% extends "shop/base.html" %}
+
+{% block content %}
+<form method="POST">
+  {% csrf_token %}
+  <div class="mb-3">
+    <label for="" class="form-label">Nom complet</label>
+    <input type="text" class="form-control" name="complet_name">
+  </div>
+  <div class="mb-3">
+    <label for="" class="form-label">Identifiant</label>
+    <input type="text" class="form-control" name="identifiant">
+  </div>
+  <div class="mb-3">
+    <label for="" class="form-label">Mot de passe</label>
+    <input type="password" class="form-control" name="mot_de_passe">
+  </div>
+  <button type="submit" class="btn btn-primary">Créer mon compte</button>
+</form>
+{% endblock %}

@@ -62,7 +62,7 @@
 
 {% block js %}
     <script type="text/javascript">
-
+        var panier;
         if(localStorage.getItem('panier') == null){
             var panier = {};
         }else{
@@ -70,7 +70,6 @@
         }
 
         $(document).on('click', '.ted', function(){
-            console.log('ajouter');
             var item_id = this.id.toString();
             console.log(item_id);
             if(panier[item_id] != undefined){
@@ -82,11 +81,11 @@
                 prix = parseFloat(document.getElementById("price"+item_id).innerHTML);
                 nom =  document.getElementById("aa"+item_id).innerHTML;
                 panier[item_id] = [quantite, nom, prix ];
-                
+                console.log(nom)
             }
-            console.log(panier);
             localStorage.setItem('panier', JSON.stringify(panier));
             document.getElementById("panier").innerHTML ="Panier("+ Object.keys(panier).length+")";  
+            //window.location.reload();
         });
 
         AfficherList(panier);
@@ -96,14 +95,16 @@
             var index = 1;
             for(var x in panier){
                 panierString += index;
-                panierString += document.getElementById("aa"+x).innerHTML + " Qte: "+ panier[x][0] + "</br>";
+                panierString += document.getElementById("aa"+x).innerHTML +" Qte: "+ panier[x][0] + "</br>";;
                 index +=1;
             }
-            panierString += "<a href='/checkout' class='btn btn-primary'>Voir</a>";
+            console.log(panierString)
+            panierString += "<a href='checkout' class='btn btn-primary'>Voir</a>";
             panierString += "<button id='remove_backet' class='btn btn-danger ms-2'>Supprimer</button>";
             $('[data-toggle="popover"]').popover();
             document.getElementById('panier').setAttribute('data-content', panierString);
         }
+        
 
         $(document).on("click", "#remove_backet", function(){
             localStorage.removeItem("panier");
