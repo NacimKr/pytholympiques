@@ -98,6 +98,11 @@ def account_user(request):
 
 
 
+def login_account_user(request):
+    pass
+
+
+
 def confimation(request):
     info = Commande.objects.all()[:1]
     for item in info:

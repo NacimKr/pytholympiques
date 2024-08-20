@@ -3,12 +3,28 @@
 {% block content %}
   {% if user.is_authenticated %}
     <h2>Votre commande {{ user.username }}</h2>
-    <ul class="list-group"></ul>  
+    <div class="list-commande"></div>  
   {% endif %}
 {% endblock %}
 
 {% block js %}
 <script>  
+  let listCommande = document.querySelector(".list-commande");
+
   console.log(localStorage)
+
+  
+  for (const my_panier in JSON.parse(localStorage.panier)){
+    let ulList = document.createElement('ul');
+    ulList.setAttribute("class", "list-group");
+
+    JSON.parse(localStorage.panier)[my_panier].forEach(panier => {
+      let list = document.createElement('li');
+      list.setAttribute("class", "list-group-item");
+      list.innerHTML += panier
+      ulList.append(list)
+    });
+    listCommande.append(ulList)
+  }
 </script>  
 {% endblock %}
