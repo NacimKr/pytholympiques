@@ -5,7 +5,7 @@ from key_generator.key_generator import generate
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.db import IntegrityError
-
+from django.contrib.auth import login
 
 # Create your views here.
 def home(request):
@@ -68,6 +68,8 @@ def create_account_user(request):
             try:
                 user = User.objects.create_user(username=userName, password=userPass)
                 user.save()
+                login(request, user)
+                return redirect("account_user")
             except IntegrityError:
                 return render(
                     request, 
@@ -88,6 +90,11 @@ def create_account_user(request):
             ) 
     else:
         return render(request, 'shop/create_user.html', {"form": UserCreationForm}) 
+
+
+
+def account_user(request):
+    return render(request, "shop/account_user.html")
 
 
 
