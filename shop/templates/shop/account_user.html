@@ -1,4 +1,14 @@
 {% extends "shop/base.html" %}
 
 {% block content %}
+  {% if user.is_authenticated %}
+    <h2>Votre commande {{ user.username }}</h2>
+    <ul class="list-group"></ul>  
+  {% endif %}
+{% endblock %}
+
+{% block js %}
+<script>  
+  console.log(localStorage)
+</script>  
 {% endblock %}
