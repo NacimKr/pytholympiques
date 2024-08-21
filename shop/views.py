@@ -2,10 +2,11 @@ from django.shortcuts import redirect, render
 from .models import Product, Commande
 from django.core.paginator import Paginator
 from key_generator.key_generator import generate
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 from django.db import IntegrityError
-from django.contrib.auth import login
+from django.contrib.auth import login, authenticate, logout
+from django.contrib import messages
 
 # Create your views here.
 def home(request):
@@ -97,9 +98,25 @@ def account_user(request):
     return render(request, "shop/account_user.html")
 
 
+def logout_account_user(request):
+    logout(request)
+    return redirect("connexion_compte")
+
+
 
 def login_account_user(request):
-    pass
+    if request.method == "POST":
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return render(request, 'shop/account_user.html')
+        else:
+            messages.info(request, "Les identifiants sont incorrect")
+    form = AuthenticationForm()
+    return render(request, "shop/login.html", {"form":form})
+
 
 
 

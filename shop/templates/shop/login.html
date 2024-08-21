@@ -1,0 +1,13 @@
+{% extends "shop/base.html" %}
+
+{% block content %}
+  {% for message in messages %}
+    <p>{{ message }}</p>
+  {% endfor %}
+
+  <form method="POST">
+    {% csrf_token %}
+    {{ form.as_div  }}
+    <input type="submit" value="Se connecter" class="btn btn-primary" />
+  </form>
+{% endblock %}
