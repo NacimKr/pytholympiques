@@ -1,5 +1,5 @@
 from django.urls import path
-from shop.views import home, index, detail, checkout, logout_account_user, confimation, create_account_user, account_user, login_account_user
+from shop.views import home, index, detail, checkout, logout_account_user, add_cart, confimation, create_account_user, account_user, login_account_user
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -7,6 +7,7 @@ urlpatterns = [
     path('', home, name='home'),
     path('billeterie/', index, name='index'),
     path('billeterie/<int:myid>', detail, name="detail"),
+    path('billeterie/add_cart/<int:myid>', add_cart, name="add_cart"),
     path('billeterie/checkout', checkout, name="checkout"),
     path('billeterie/confirmation', confimation, name="confirmation" ),
     path('billeterie/creation_compte', create_account_user, name="creation_compte" ),

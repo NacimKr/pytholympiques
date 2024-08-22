@@ -1,9 +1,8 @@
-from django.shortcuts import redirect, render
-from .models import Product, Commande
+from django.shortcuts import redirect, render, get_object_or_404
+from .models import Product, User, Order, Cart
 from django.core.paginator import Paginator
 from key_generator.key_generator import generate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
@@ -32,25 +31,7 @@ def detail(request, myid):
 
 def checkout(request):
     if request.method == "POST":
-        items = request.POST.get('items')
-        total = request.POST.get('total')
-        nom = request.POST.get('nom')
-        email = request.POST.get('email')
-        address = request.POST.get('address')
-        ville = request.POST.get('ville')
-        pays = request.POST.get('pays')
-        zipcode= request.POST.get('zipcode')
-        com = Commande(
-            items=items,
-            total=total, 
-            nom=nom, 
-            email=email, 
-            address=address, 
-            ville=ville, 
-            pays=pays, 
-            zipcode=zipcode
-        )
-        com.save()
+        pass
         return redirect('confirmation')
     return render(request, 'shop/checkout.html') 
 
@@ -118,10 +99,24 @@ def login_account_user(request):
     return render(request, "shop/login.html", {"form":form})
 
 
+def add_cart(request, myid):
+    user = request.user
+    product = get_object_or_404(Product, id=myid)
+    panier_cart, _ = Cart.objects.get_or_create(user=user)
+    order, created = Order.objects.get_or_create(user=user, product=product)
+    
+    if created:
+        panier_cart.orders.add(order)
+        panier_cart.save()
+    else:
+        order.quantity += 1
+        order.save()
+        
+    return redirect("index")
 
 
 def confimation(request):
-    info = Commande.objects.all()[:1]
+    info = Product.objects.all()[:1]
     for item in info:
         nom = item.nom
     return render(request, 'shop/confirmation.html', {'name': nom})          
