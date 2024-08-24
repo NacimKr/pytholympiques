@@ -17,6 +17,7 @@
         </div>
     </div>
 
+    {% if user.is_authenticated %}
     <div class="row mt-3">
         {% for product in product_object %}
         <div class="col-md-3">
@@ -30,12 +31,10 @@
                 </div>
             </div>
         </div>
-        {% endfor %}
+        {% endfor %}        
     </div>
 
-    
-
-    <div class="row mt-3">
+    <div class="mt-3">
         <div class="col-md-3 offset-md-4">
             <ul class="pagination">
                 {% if product_object.has_previous %}
@@ -58,61 +57,146 @@
         </div>
     </div>
 
+    <div>
+        <h4>Votre panier</h4>
+        <div class="d-flex">
+            {% if order_user|length == 0 %}
+            <div class="card">
+                <div class="card-body">
+                    <h5>Votre panier est vide</h5>
+                </div>
+            </div>
+            {% else %}
+                {% for order in order_user %}
+                    <div class="card mx-2">
+                        <div class="card-body">
+                            <p><strong>quantités : </strong>{{ order.quantity }}</p>
+                            <p>
+                                <p><strong>produit : </strong>{{ order.product.title }}</p>
+                            </p>
+                            <a href="{% url "delete_cart_by_id" order.id %}" class="text-decoration-none text-danger">Supprimer</a>
+                        </div>                        
+                    </div>
+                {% endfor %}
+                {% endif %}
+            </div>
+            {% if order_user|length > 0 %}
+                <div>
+                    <a href="{% url "checkout" %}" class="btn btn-primary btn-sm display-block mt-2">Récapitulatif</a>
+                    <a href="{% url "delete_cart" %}" class="btn btn-danger btn-sm display-block mt-2">Supprimer votre panier</a>
+                </div>
+                <strong>Total : </strong> {{ total }}€
+            {% endif %}
+        {% else %}
+            {% comment %} ////////// {% endcomment %}
+
+                <div class="row mt-3">
+                    {% for product in product_object %}
+                    <div class="col-md-3">
+                        <div class="card">
+                            <img src="{{ product.image }}" alt="" class="card-ing-top">
+                            <div class="card-body">
+                                <div id="aa{{ product.id }}" class="card-title">{{ product.title }}</div>
+                                <div id="price{{ product.id }}" style="color:orange" class="card-text"> {{ product.price }}</div>
+                                {% comment %} <a href="#" class="btn btn-warning">Détails</a> {% endcomment %}
+                                <a 
+                                    href="#" 
+                                    onclick="ajouterAuPanier({{ product.id }}, '{{ product.title }}', {{ product.price }})" 
+                                    data-index="{{ product.id }}" 
+                                    class="btn ted btn-success"
+                                >
+                                Ajouter au panier
+                            </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}        
+                </div>
+
+                <div class="mt-3">
+                    <div class="col-md-3 offset-md-4">
+                        <ul class="pagination">
+                            {% if product_object.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ product_object.previous_page_number }}">Precedent</a>
+                                </li>
+                            {% endif %}    
+            
+                                <li class="page-item active">
+                                    <a class="page-link" href="?page={{ product_object.number }}">{{ product_object.number }}</a>
+                                </li>
+            
+                            {% if product_object.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ product_object.next_page_number }}">Suivant</a>
+                                </li>
+                            {% endif %} 
+            
+                        </ul>
+                    </div>
+                </div>
+                <div>
+                    <h4>Votre panier</h4>
+                    <div id="panier"></div>
+                </div>
+
+
+            {% comment %} ////////// {% endcomment %}
+        {% endif %}
+    </div>
 {% endblock %}
 
 {% block js %}
-    <script type="text/javascript">
-        var panier;
-        if(localStorage.getItem('panier') == null){
-            var panier = {};
-        }else{
-            panier = JSON.parse(localStorage.getItem('panier'));
+<script>
+    // Charger le panier au chargement de la page
+    document.addEventListener("DOMContentLoaded", function() {
+        afficherPanier();
+    });
+
+    // Fonction pour ajouter un produit au panier
+    function ajouterAuPanier(id, nom, prix) {
+        let panier = JSON.parse(sessionStorage.getItem('panier')) || [];
+
+        // Vérifier si le produit existe déjà dans le panier
+        let produitExistant = panier.find(produit => produit.id === id);
+
+        if (produitExistant) {
+            // Incrémenter la quantité
+            produitExistant.quantite += 1;
+        } else {
+            // Ajouter un nouveau produit
+            panier.push({ id: id, nom: nom, prix: prix, quantite: 1 });
         }
 
-        $(document).on('click', '.ted', function(){
-            var item_id = this.id.toString();
-            console.log(item_id);
-            if(panier[item_id] != undefined){
-                quantite = panier[item_id][0] +1 ;
-                panier[item_id][0] = quantite;
-                panier[item_id][2] += parseFloat(document.getElementById("price"+item_id).innerHTML);
-            }else{
-                quantite = 1;
-                prix = parseFloat(document.getElementById("price"+item_id).innerHTML);
-                nom =  document.getElementById("aa"+item_id).innerHTML;
-                panier[item_id] = [quantite, nom, prix ];
-                console.log(nom)
-            }
-            localStorage.setItem('panier', JSON.stringify(panier));
-            document.getElementById("panier").innerHTML ="Panier("+ Object.keys(panier).length+")";  
-            //window.location.reload();
-        });
+        // Mettre à jour le panier dans le localStorage
+        sessionStorage.setItem('panier', JSON.stringify(panier));
 
-        AfficherList(panier);
-        function AfficherList(panier){
-            var panierString = " ";
-            panierString += "<h5>Voici votre liste</h5>";
-            var index = 1;
-            for(var x in panier){
-                panierString += index;
-                panierString += document.getElementById("aa"+x).innerHTML +" Qte: "+ panier[x][0] + "</br>";;
-                index +=1;
-            }
-            console.log(panierString)
-            panierString += "<a href='checkout' class='btn btn-primary'>Voir</a>";
-            panierString += "<button id='remove_backet' class='btn btn-danger ms-2'>Supprimer</button>";
-            $('[data-toggle="popover"]').popover();
-            document.getElementById('panier').setAttribute('data-content', panierString);
+        // Afficher le panier mis à jour
+        afficherPanier();
+    }
+
+    // Fonction pour afficher le panier
+    function afficherPanier() {
+        let panier = JSON.parse(sessionStorage.getItem('panier')) || [];
+        let panierDiv = document.getElementById('panier');
+        panierDiv.innerHTML = '';
+
+        if (panier.length === 0) {
+            panierDiv.innerHTML = '<p>Votre panier est vide</p>';
+        } else {
+            panier.forEach(produit => {
+                panierDiv.innerHTML += `<p>${produit.nom} - ${produit.prix}€ - Quantité: ${produit.quantite}</p>`;
+                {% comment %} let btnRemove = document.createElement("a")
+                btnRemove.setAttribute("href",`delete_cart/${produit.id}`)
+                btnRemove.innerHTML = "Supprimer"
+                panierDiv.append(btnRemove) {% endcomment %}
+            });
+            let commande = document.createElement("a");
+            commande.setAttribute("class", "btn btn-primary");
+            commande.setAttribute("href", "confirmation");
+            commande.innerHTML = "Commander";
+            panierDiv.append(commande)
         }
-        
-
-        $(document).on("click", "#remove_backet", function(){
-            localStorage.removeItem("panier");
-            window.location.reload();
-        });
-
-        document.getElementById("panier").innerHTML ="Panier("+ Object.keys(panier).length+")"; 
-
-    </script>
-
+    }
+</script>
 {% endblock %}

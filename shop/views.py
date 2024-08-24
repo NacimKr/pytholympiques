@@ -21,7 +21,25 @@ def index(request):
     paginator = Paginator(product_object, 4)
     page = request.GET.get('page')
     product_object = paginator.get_page(page)
-    return render(request, 'shop/index.html', {'product_object': product_object})
+    
+    total_prix = 0
+    order_user = Order.objects.all()
+    
+    print("-------------------------------------")
+    print(request.user)
+    print(type(request.user))
+    print("-------------------------------------")
+
+    
+    if not request.user.is_anonymous:
+        order_user = Order.objects.filter(user=request.user)
+    
+    for order in order_user:
+        total_prix += order.quantity * order.product.price
+
+    print(order_user)
+        
+    return render(request, 'shop/index.html', {'product_object': product_object, "order_user":order_user, "total" : total_prix})
 
 
 def detail(request, myid):
@@ -33,7 +51,15 @@ def checkout(request):
     if request.method == "POST":
         pass
         return redirect('confirmation')
-    return render(request, 'shop/checkout.html') 
+    
+    order_user = Order.objects.filter(user=request.user)
+    print(type(order_user))
+    print(order_user)
+    total_prix = 0
+    
+    for order in order_user:
+        total_prix += order.quantity * order.product.price
+    return render(request, 'shop/checkout.html', {"order_user":order_user, "total" : total_prix}) 
 
 
 def create_account_user(request):
@@ -42,10 +68,6 @@ def create_account_user(request):
         userName = request.POST.get('username', None)
         userPass = request.POST.get('password1', None)
         userPassConfirm = request.POST.get('password2', None)
-        print(userName)
-        print(userPass)
-        print(userPassConfirm)
-        print(key.get_key())
         if userPass == userPassConfirm:
             try:
                 user = User.objects.create_user(username=userName, password=userPass)
@@ -92,7 +114,12 @@ def login_account_user(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return render(request, 'shop/account_user.html')
+            ######
+            order_user = Order.objects.filter(user=request.user)
+            total_prix = 0
+            for order in order_user:
+                total_prix += order.quantity * order.product.price
+            return render(request, 'shop/account_user.html',{"order_user":order_user, "total" : total_prix})
         else:
             messages.info(request, "Les identifiants sont incorrect")
     form = AuthenticationForm()
@@ -104,19 +131,33 @@ def add_cart(request, myid):
     product = get_object_or_404(Product, id=myid)
     panier_cart, _ = Cart.objects.get_or_create(user=user)
     order, created = Order.objects.get_or_create(user=user, product=product)
-    
     if created:
         panier_cart.orders.add(order)
         panier_cart.save()
     else:
         order.quantity += 1
         order.save()
-        
     return redirect("index")
 
 
+def delete_cart(request):
+    if cart := request.user.cart:
+        cart.orders.all().delete()
+        cart.delete()
+    return redirect("index")
+
+
+def delete_cart_by_id(request, id):
+    if cart := request.user.cart:
+        cart.orders.filter(id=id).delete()
+        cart.delete()
+    return redirect("index")
+
+def delete_cart_by_id_no_connect(request, id):
+    Cart.orders.filter(id=id).delete()
+    Cart.delete()
+    return redirect("index")
+
 def confimation(request):
     info = Product.objects.all()[:1]
-    for item in info:
-        nom = item.nom
-    return render(request, 'shop/confirmation.html', {'name': nom})          
+    return render(request, 'shop/confirmation.html')          

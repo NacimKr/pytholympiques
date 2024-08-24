@@ -5,7 +5,17 @@
     <div class="col-md-12">
         <ul class="list-group" id="item-list">
             <h3 class="text-center ">Voici votre liste</h3>
-           
+            {% for order in order_user %}
+            <div class="card mx-2">
+                <div class="card-body">
+                    <p><strong>quantités : </strong>{{ order.quantity }}</p>
+                    <p>
+                        <p><strong>produit : </strong>{{ order.product.title }}</p>
+                    </p>
+                    <a href="{% url "delete_cart_by_id" order.id %}" class="text-decoration-none text-danger">Supprimer</a>
+                </div>                        
+            </div>
+        {% endfor %}
            
         </ul>
     </div>
@@ -48,7 +58,7 @@
             </div>
             <div class="form-group col-md-2">
               <label for="inputZip">Somme total a payer </label>
-              <input name="total" id="total" type="readonly" class=" bg-dark text-warning form-control" >
+              <input name="total" id="total" type="readonly" class=" bg-dark text-warning form-control" value="{{ total }}€">
             </div>
           </div>
             <div class="form-group">
@@ -57,41 +67,4 @@
           </form>
     </div>
 </div>
-{% endblock %}
-{% block js %}
-    <script type="text/javascript">
-        if(localStorage.getItem('panier')==null){
-            var panier =  {};
-
-        }else{
-            panier = JSON.parse(localStorage.getItem('panier'));
-        }
-        var total = 0;
-        var nombre = 0;
-        for(item in panier){
-            let nom = panier[item][1];
-            let quantite = panier[item][0];
-            let prix = panier[item][2];
-            nombre += quantite;
-            total += prix;
-            let itemString = ` <li class="list-group-item d-flex justify-content-between align-items-center">
-              ${nom}
-              <span class="badge badge-primary badge-pill"> QTE: ${quantite}</span>
-              <span class="badge badge-warning badge-pill">$ ${prix}</span>
-            </li>`;
-            $('#item-list').append(itemString);
-        }
-        let itemNombre = ` <li class="list-group-item d-flex justify-content-between align-items-center">
-              <b class="bg-danger ">PRIX ET QUANTITE TOTAL</b>
-              <span class="badge badge-danger badge-pill"> TQTE: ${nombre}</span>
-              <span class="badge badge-danger badge-pill">$ ${total}</span>
-            </li>`;
-            $('#item-list').append(itemNombre);
-            $('#total').val("$"+total);
-
-
-        $('#items').val(JSON.stringify(panier));
-       
-
-    </script>
 {% endblock %}
