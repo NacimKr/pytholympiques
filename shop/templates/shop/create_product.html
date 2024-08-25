@@ -1,0 +1,12 @@
+{% extends "shop/base.html" %}
+
+{% block content %}
+
+<form method="POST">
+  {% csrf_token %}
+  {{ productForm.as_div }}
+  <button type="submit" class="mt-2 btn btn-primary">Ajouter</button>
+</form>
+
+
+{% endblock %}

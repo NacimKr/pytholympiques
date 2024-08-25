@@ -6,10 +6,25 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.db import IntegrityError
 from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
+from .forms import ProductForm
 
 # Create your views here.
 def home(request):
     return render(request, 'shop/home.html')
+
+
+def create_product(request):
+    if request.method == "POST":
+        new_product = Product.objects.create(
+            title = request.POST.get("title"),
+            price = request.POST.get("price"),
+            description = request.POST.get("description"),
+            image = request.POST.get("image"),
+            quantity = request.POST.get("quantity"),
+        )
+        new_product.save()
+        return redirect("index")
+    return render(request,"shop/create_product.html",{"productForm":ProductForm})
 
 
 def index(request):

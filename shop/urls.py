@@ -1,11 +1,12 @@
 from django.urls import path
-from shop.views import home, index, detail, success_payment, checkout, logout_account_user, add_cart, payment, confimation, create_account_user, account_user, login_account_user, delete_cart, delete_cart_by_id
+from shop.views import home, index, detail, success_payment, create_product ,checkout, logout_account_user, add_cart, payment, confimation, create_account_user, account_user, login_account_user, delete_cart, delete_cart_by_id
 from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
     path('', home, name='home'),
     path('billeterie/', index, name='index'),
+    path('billeterie/create_product', create_product, name='create_product'),
     path('billeterie/<int:myid>', detail, name="detail"),
     path('billeterie/add_cart/<int:myid>', add_cart, name="add_cart"),
     path('billeterie/checkout', checkout, name="checkout"),

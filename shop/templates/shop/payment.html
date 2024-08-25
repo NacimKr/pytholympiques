@@ -2,7 +2,7 @@
 
 {% block content %}
     <div class="list-payment"></div>
-    <a href="{% url "success_payment" %}" class="btn btn-primary">Valider le paiement</a>
+    <a href="{% url "success_payment" %}" id="valid_payment" class="btn btn-primary">Valider le paiement</a>
 {% endblock %}
 
 {% block js %}
@@ -19,6 +19,10 @@
   let divTotalCommande = document.createElement("div");
   divTotalCommande.innerHTML = "<strong>Total de la commande : "+totalCommande+"€</strong>";
   document.querySelector('.list-payment').append(divTotalCommande);
+
+  document.querySelector("#valid_payment").addEventListener("click",function(){
+    sessionStorage.clear();
+  })
 
 
 
