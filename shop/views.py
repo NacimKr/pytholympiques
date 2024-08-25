@@ -161,3 +161,10 @@ def delete_cart_by_id_no_connect(request, id):
 def confimation(request):
     info = Product.objects.all()[:1]
     return render(request, 'shop/confirmation.html')          
+
+
+def payment(request):
+    return render(request, 'shop/payment.html')          
+
+def success_payment(request):
+    return render(request, 'shop/success_payment.html')          

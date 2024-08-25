@@ -17,6 +17,7 @@
   
   <div class="list-commande"></div>
 </div>
+<a href="{% url "payment" %}" class="btn btn-primary">Passer au paiement</a>
 
 {% if order_user|length > 0 %}
 <div>
@@ -33,13 +34,19 @@
 
 {% block js %}
 <script>
-  console.log(JSON.parse(sessionStorage.getItem("panier")))
-
+  let totalCommande = 0;
+  
   JSON.parse(sessionStorage.getItem("panier")).forEach(commande => {
-    let sectionCommande = document.createElement("div")
-    sectionCommande.innerHTML += commande.nom + " " + commande.prix+"€" + "QTE : "+commande.quantite
-    document.querySelector('.list-commande').append(sectionCommande)
-  })
+    let sectionCommande = document.createElement("div");
+    sectionCommande.innerHTML += commande.nom + " " + commande.prix+"€" + "QTE : "+commande.quantite;
+    document.querySelector('.list-commande').append(sectionCommande);
+    totalCommande += commande.prix
+  });
+  
+  let divTotalCommande = document.createElement("div");
+  divTotalCommande.innerHTML = "<strong>Total de la commande : "+totalCommande+"€</strong>";
+  document.querySelector('.list-commande').append(divTotalCommande);
+
 
 
 </script>

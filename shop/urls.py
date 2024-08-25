@@ -1,5 +1,5 @@
 from django.urls import path
-from shop.views import home, index, detail, checkout, logout_account_user, add_cart, confimation, create_account_user, account_user, login_account_user, delete_cart, delete_cart_by_id
+from shop.views import home, index, detail, success_payment, checkout, logout_account_user, add_cart, payment, confimation, create_account_user, account_user, login_account_user, delete_cart, delete_cart_by_id
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -16,5 +16,7 @@ urlpatterns = [
     path('billeterie/delete_cart/<int:id>', delete_cart_by_id, name="delete_cart_by_id" ),
     path('billeterie/deconnexion', logout_account_user, name="logout" ),
     path('billeterie/page_de_connexion', account_user, name="account_user" ),
+    path('billeterie/paiement', payment, name="payment" ),
+    path('billeterie/success_paiement', success_payment, name="success_payment" ),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
