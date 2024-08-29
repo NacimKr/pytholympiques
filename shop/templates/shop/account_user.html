@@ -1,53 +1,76 @@
 {% extends "shop/base.html" %}
 
 {% block content %}
-<h2>Votre commande {{ user.username }}</h2>
-<div class="list-commande">
-  {% for order in order_user %}
-  <div class="card mx-2">
-    <div class="card-body">
-      <p><strong>quantités : </strong>{{ order.quantity }}</p>
-      <p>
-        <p><strong>produit : </strong>{{ order.product.title }}</p>
-      </p>
-      <a href="{% url "delete_cart_by_id" order.id %}" class="text-decoration-none text-danger">Supprimer</a>
-    </div>                        
-  </div>
-  {% endfor %}
-  
-  <div class="list-commande"></div>
-</div>
-<a href="{% url "payment" %}" class="btn btn-primary">Passer au paiement</a>
+    <h2>Votre commande {{ user.username }}</h2>
+    {% if not user.is_authenticated %}
+      <div class="list-commande-session"></div>
+      {% else %}
+      <div class="list-commande">
+        {% for order in order_user %}
+        <div class="card mx-2">
+          <div class="card-body">
+            <p><strong>quantités : </strong>{{ order.quantity }}</p>
+            <p>
+              <p><strong>produit : </strong>{{ order.product.title }}</p>
+            </p>
+            <a href="{% url "delete_cart_by_id" order.id %}" class="text-decoration-none text-danger">Supprimer</a>
+          </div>                        
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+      
+      <form action="{% url "payment" %}" method="POST">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary">Passer au paiement</button>
+      </form>
 
-{% if order_user|length > 0 %}
-<div>
-  <a href="{% url "checkout" %}" class="btn btn-primary btn-sm display-block mt-2">Récapitulatif</a>
-  <a href="{% url "delete_cart" %}" class="btn btn-danger btn-sm display-block mt-2">Supprimer votre panier</a>
-</div>
-<strong>Total : </strong> {{ total }}€
-{% endif %}
+    {% if order_user|length > 0 %}
+        <div>
+          <a href="{% url "checkout" %}" class="btn btn-primary btn-sm display-block mt-2">Récapitulatif</a>
+          <a href="{% url "delete_cart" %}" class="btn btn-danger btn-sm display-block mt-2">Supprimer votre panier</a>
+        </div>
+        <strong>Total : </strong> {{ total }}€
+    {% endif %}
 {% endblock %}
-
-
-
 
 
 {% block js %}
 <script>
   let totalCommande = 0;
+  let form = document.querySelector("form");
   
-  JSON.parse(sessionStorage.getItem("panier")).forEach(commande => {
-    let sectionCommande = document.createElement("div");
-    sectionCommande.innerHTML += commande.nom + " " + commande.prix+"€" + "QTE : "+commande.quantite;
-    document.querySelector('.list-commande').append(sectionCommande);
-    totalCommande += commande.prix
-  });
-  
-  let divTotalCommande = document.createElement("div");
-  divTotalCommande.innerHTML = "<strong>Total de la commande : "+totalCommande+"€</strong>";
-  document.querySelector('.list-commande').append(divTotalCommande);
-
-
-
+  if(sessionStorage.getItem("panier") !== null){
+    JSON.parse(sessionStorage.getItem("panier"))
+    .forEach((commande, key) => {
+      let divTotalCommande = document.createElement("div");
+      divTotalCommande.setAttribute("class","d-flex")
+      console.log(Object.entries(commande))
+      Object.entries(commande)
+      .filter(filter_item => filter_item[0] !== "id")
+      .forEach((item, item_key) => {
+          let div = document.createElement("div");
+          let labelCommande = document.createElement("label");
+          let sectionCommande = document.createElement("input");
+          sectionCommande.setAttribute("type","text")
+          sectionCommande.setAttribute("class","form-control")
+          sectionCommande.setAttribute("name",item[0]+"-"+(1+key))
+          labelCommande.innerHTML = item[0]
+          sectionCommande.value = item[1]
+          sectionCommande.setAttribute("value",item[1])
+          div.append(labelCommande,sectionCommande);
+          form.append(div)
+          //document.querySelector('.list-commande-session').append(divTotalCommande);
+        })
+        //divTotalCommande.append(form)
+      totalCommande += commande.prix
+    });
+    
+    let divTotalCommande = document.createElement("div");
+    divTotalCommande.innerHTML = "<strong>Total de la commande : "+totalCommande+"€</strong>";
+    //document.querySelector('.list-commande-session').append(divTotalCommande);
+  }else{
+    console.log("y'a rien")
+  }
 </script>
 {% endblock %}

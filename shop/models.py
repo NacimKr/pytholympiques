@@ -24,7 +24,7 @@ class User(AbstractUser):
 class Product(models.Model):
     title = models.CharField(max_length=200)
     price = models.FloatField()
-    description = models.TextField()
+    description = models.TextField(blank=True)
     image = models.CharField(max_length=5000, blank=True)
     date_added = models.DateTimeField(auto_now=True)
     quantity = models.IntegerField(default=0)

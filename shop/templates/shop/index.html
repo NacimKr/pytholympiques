@@ -26,8 +26,13 @@
                 <div class="card-body">
                     <div id="aa{{ product.id }}" class="card-title">{{ product.title }}</div>
                     <div id="price{{ product.id }}" style="color:orange" class="card-text"> {{ product.price }}</div>
-                    <a href="{{ product.id }}" class="btn btn-warning">Détails</a>
-                    <a href="add_cart/{{ product.id }}" class="btn ted btn-success">Ajouter au panier</a>
+                    {% if user.is_superuser %}
+                    <a href="{{ product.id }}" class="btn btn-warning">Modifer</a>
+                    <a href="add_cart/{{ product.id }}" class="btn ted btn-danger">Supprimer</a>
+                    {% else %}
+                        <a href="{{ product.id }}" class="btn btn-warning">Détails</a>
+                        <a href="add_cart/{{ product.id }}" class="btn ted btn-success">Ajouter au panier</a>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -58,15 +63,17 @@
     </div>
 
     <div>
-        <h4>Votre panier</h4>
+        {% if not user.is_superuser %}
+            <h4>Votre panier</h4>
+        {% endif %}
         <div class="d-flex">
-            {% if order_user|length == 0 %}
+            {% if order_user|length == 0 and not user.is_superuser %}
             <div class="card">
                 <div class="card-body">
                     <h5>Votre panier est vide</h5>
                 </div>
             </div>
-            {% else %}
+            {% elif not user.is_superuser %}
                 {% for order in order_user %}
                     <div class="card mx-2">
                         <div class="card-body">
@@ -135,10 +142,13 @@
                         </ul>
                     </div>
                 </div>
+
+                {% if not user.is_superuser %}
                 <div>
                     <h4>Votre panier</h4>
                     <div id="panier"></div>
                 </div>
+                {% endif %}
 
 
             {% comment %} ////////// {% endcomment %}
@@ -195,7 +205,18 @@
             commande.setAttribute("class", "btn btn-primary");
             commande.setAttribute("href", "confirmation");
             commande.innerHTML = "Commander";
-            panierDiv.append(commande)
+
+            let supprimerCommande = document.createElement("a");
+            supprimerCommande.setAttribute("class", "btn btn-danger ms-2");
+            supprimerCommande.setAttribute("href", "#");
+            supprimerCommande.innerHTML = "Supprimer le panier";
+
+            supprimerCommande.addEventListener("click",()=>{
+                sessionStorage.removeItem("panier");
+                window.location.reload()
+            });
+
+            panierDiv.append(commande, supprimerCommande)
         }
     }
 </script>

@@ -1,30 +1,88 @@
 {% extends "shop/base.html" %}
 
 {% block content %}
-    <div class="list-payment"></div>
-    <a href="{% url "success_payment" %}" id="valid_payment" class="btn btn-primary">Valider le paiement</a>
+  <h1>Finalisation de paiement<h1>
+  {% if not user.is_authenticated %}
+    <div class="list-payment-session"></div>
+  {% else %}
+    <div class="list-payment">
+      {% for order in order_user %}
+        <div class="card mx-2">
+          <div class="card-body">
+            <p><strong>quantités : </strong>{{ order.quantity }}</p>
+            <p>
+              <p><strong>produit : </strong>{{ order.product.title }}</p>
+            </p>
+            <a href="{% url "delete_cart_by_id" order.id %}" class="text-decoration-none text-danger">Supprimer</a>
+          </div>                        
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+
+  <form action="{% url "success_payment" %}" method="POST">
+    {% csrf_token %}
+    <button type="submit"  class="btn btn-primary">Passer au paiement</button>
+  </form>
+
+  {% if order_user|length > 0 %}
+    <div>
+      <a href="{% url "checkout" %}" class="btn btn-primary btn-sm display-block mt-2">Récapitulatif</a>
+      <a href="{% url "delete_cart" %}" class="btn btn-danger btn-sm display-block mt-2">Supprimer votre panier</a>
+    </div>
+    <strong>Total : </strong> {{ total }}€
+  {% endif %}
 {% endblock %}
 
+
+
 {% block js %}
-<script>
-  let totalCommande = 0;
-  
-  JSON.parse(sessionStorage.getItem("panier")).forEach(commande => {
-    let sectionCommande = document.createElement("div");
-    sectionCommande.innerHTML += commande.nom + " " + commande.prix+"€" + "QTE : "+commande.quantite;
-    document.querySelector('.list-payment').append(sectionCommande);
-    totalCommande += commande.prix
-  });
-  
-  let divTotalCommande = document.createElement("div");
-  divTotalCommande.innerHTML = "<strong>Total de la commande : "+totalCommande+"€</strong>";
-  document.querySelector('.list-payment').append(divTotalCommande);
+  <script>
+    let totalCommande = 0;
+    let form = document.querySelector("form");
 
-  document.querySelector("#valid_payment").addEventListener("click",function(){
-    sessionStorage.clear();
-  })
+    console.log(JSON.parse(sessionStorage.getItem("panier")).length)
+    
+    if(sessionStorage.getItem("panier") !== null){
+      JSON.parse(sessionStorage.getItem("panier"))
+      .forEach((commande, key) => {
+        let divTotalCommande = document.createElement("div");
+        divTotalCommande.setAttribute("class","d-flex")
+        console.log(Object.entries(commande))
+        Object.entries(commande)
+        .filter(filter_item => filter_item[0] !== "id")
+        .forEach(item => {
+          //console.log(item)
+          let div = document.createElement("div");
+          let labelCommande = document.createElement("label");
+          let sectionCommande = document.createElement("input");
+          sectionCommande.setAttribute("type","text")
+          sectionCommande.setAttribute("class","form-control")
+          sectionCommande.setAttribute("name",item[0]+"-"+(1+key))
+          labelCommande.innerHTML = item[0]
+          sectionCommande.value = item[1]
+          sectionCommande.setAttribute("value",item[1])
+          div.append(labelCommande,sectionCommande);
+          form.append(div)
+          //document.querySelector('.list-commande-session').append(divTotalCommande);
+        })
+        //divTotalCommande.append(form)
+        totalCommande += commande.prix
+      });
 
-
-
-</script>
+      form.addEventListener("submit",async(e)=>{
+        //e.preventDefault()
+        const reponse = await fetch("get_number_product_in_cart",{
+          method: "POST",
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',  // Format des données
+            'X-CSRFToken': '{{ csrf_token }}'  // Nécessaire pour les requêtes POST en Django
+        },
+          body: JSON.stringify(JSON.parse(sessionStorage.getItem("panier")).length)
+        });
+        const films = await reponse.json();
+      })
+    }
+  </script>
 {% endblock %}
