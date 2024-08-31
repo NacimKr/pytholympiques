@@ -2,24 +2,29 @@
 
 {% block content %}
     <h2>Votre commande {{ user.username }}</h2>
-    {% if not user.is_authenticated %}
+    {% if not user.is_authenticated and not user.username %}
       <div class="list-commande-session"></div>
       {% else %}
-      <div class="list-commande">
-        {% for order in order_user %}
-        <div class="card mx-2">
-          <div class="card-body">
-            <p><strong>quantités : </strong>{{ order.quantity }}</p>
-            <p>
-              <p><strong>produit : </strong>{{ order.product.title }}</p>
-            </p>
-            <a href="{% url "delete_cart_by_id" order.id %}" class="text-decoration-none text-danger">Supprimer</a>
-          </div>                        
+        <div class="list-commande">
+          {% if order_user|length > 0 %}
+            {% for order in order_user %}
+            <div class="card mx-2">
+              <div class="card-body">
+                <p><strong>quantités : </strong>{{ order.quantity }}</p>
+                <p>
+                  <p><strong>produit : </strong>{{ order.product.title }}</p>
+                </p>
+                <a href="{% url "delete_cart_by_id" order.id %}" class="text-decoration-none text-danger">Supprimer</a>
+              </div>                        
+            </div>
+            {% endfor %}
+          {% else %}
+            <p>Cette utilisateur n'a rien commandé</p>
+          {% endif %}
         </div>
-        {% endfor %}
-      </div>
       {% endif %}
-      
+
+
       <form action="{% url "payment" %}" method="POST">
         {% csrf_token %}
         <button type="submit" class="btn btn-primary">Passer au paiement</button>

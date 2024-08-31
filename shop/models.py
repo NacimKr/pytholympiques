@@ -5,22 +5,9 @@ from ecommerce.settings import AUTH_USER_MODEL
 
 
 class User(AbstractUser):
-    pass
-
-
-# # Create your models here.
-# class Category(models.Model):
-#     name = models.CharField(max_length=200)
-#     date_added = models.DateTimeField(auto_now=True)
-
-#     class Meta:
-#         ordering = ['-date_added']
-#     def __str__(self):
-#         return self.name    
+    key_generate = models.CharField(default="",max_length=200)
     
-    
-
-    
+  
 class Product(models.Model):
     title = models.CharField(max_length=200)
     price = models.FloatField()
@@ -40,6 +27,7 @@ class Order(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.IntegerField(default=1)
     ordered = models.BooleanField(default=False)
+    key_generate_order = models.CharField(default="",max_length=200)
 
     
     

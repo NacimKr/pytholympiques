@@ -8,6 +8,7 @@ from django.db import IntegrityError
 from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
 from .forms import ProductForm
+from .forms import UserForm
 
 
 
@@ -94,9 +95,20 @@ def create_account_user(request):
         userName = request.POST.get('username', None)
         userPass = request.POST.get('password1', None)
         userPassConfirm = request.POST.get('password2', None)
+        firstName = request.POST.get('first_name', None)
+        lastName = request.POST.get('last_name', None)
+        email = request.POST.get('email', None)
+        userPassConfirm = request.POST.get('password2', None)
         if userPass == userPassConfirm:
             try:
-                user = User.objects.create_user(username=userName, password=userPass)
+                user = User.objects.create_user(
+                    username=userName, 
+                    last_name=lastName, 
+                    first_name=firstName,
+                    email=email, 
+                    password=userPass,
+                    key_generate=key.get_key()
+                )
                 user.save()
                 login(request, user)
                 return redirect("account_user")
@@ -105,7 +117,7 @@ def create_account_user(request):
                     request, 
                     'shop/create_user.html', 
                     {
-                        "form": UserCreationForm,
+                        "form": UserForm,#UserCreationForm,
                         "erreur": "Cet utilisateur est déjà inscrit"
                     }
                 ) 
@@ -114,12 +126,12 @@ def create_account_user(request):
                 request, 
                 'shop/create_user.html', 
                 {
-                    "form": UserCreationForm,
+                    "form": UserForm, #UserCreationForm,
                     "erreur" : "Les mots de passe ne sont pas identiques"
                 }
             ) 
     else:
-        return render(request, 'shop/create_user.html', {"form": UserCreationForm}) 
+        return render(request, 'shop/create_user.html', {"form":  UserForm}) #UserCreationForm, 
 
 
 
@@ -178,6 +190,7 @@ def add_cart(request, myid):
     else:
         order.quantity += 1
         order.save()
+
     return redirect("index")
 
 
@@ -212,23 +225,23 @@ def confimation(request):
 
 
 def payment(request):
-    # print(int(request.session.get("nb")))
     return render(request, 'shop/payment.html')          
 
 
 
 def success_payment(request):
-    #print(int(request.session.get("nb")))
-    if request.method == "POST":
+    key = generate(seed = 101)
+    print(key.get_key())
+    if request.method == "POST" and request.session.get("nb") is not None:
         for i in range(1,int(request.session.get("nb"))+1):
-            print(i)
             new_product = Order.objects.create(
                 user = User.objects.get(username=request.user),
                 product = Product.objects.get(
                     title=request.POST["nom-"+str(i)]
                 ),
                 quantity = request.POST["quantite-"+str(i)],
-                ordered = True
+                ordered = True,
+                key_generate_order = key.get_key()
             )
             new_product.save()
 

@@ -24,6 +24,11 @@
             <li class="nav-item active">
               <a class="nav-link" href="{% url 'index' %}">E-Billets</a>
             </li>
+            {% if user.is_authenticated %}
+              <li class="nav-item active">
+                <a class="nav-link" href="{% url 'account_user' %}">Vos Commandes</a>
+              </li>
+            {% endif %}
           </ul>
           {% if user.is_superuser %}
             <a href="{% url "create_product" %}" class="btn btn-primary mx-2">
