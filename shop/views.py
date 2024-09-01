@@ -11,14 +11,12 @@ from .forms import ProductForm
 from .forms import UserForm
 
 
-
-nb_product = None
-
+""" Methode pour afficher la page d'accueil """
 def home(request):
     return render(request, 'shop/home.html')
 
 
-
+""" Methode pour créer un produit en tant qu'administrateur """
 def create_product(request):
     if request.method == "POST":
         new_product = Product.objects.create(
@@ -29,13 +27,35 @@ def create_product(request):
             quantity = request.POST.get("quantity"),
         )
         new_product.save()
-        print(new_product)
-        print(type(new_product))
+        # print(new_product)
+        # print(type(new_product))
         return redirect("index")
     return render(request,"shop/create_product.html",{"productForm":ProductForm})
 
 
+""" Methode pour modifier un produit en tant qu'administrateur """
+def edit_product(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
 
+    if request.method == 'POST':
+        form = ProductForm(request.POST, instance=product)
+        if form.is_valid():
+            form.save()
+            return redirect('index')  # Redirige vers la liste des produits ou une autre vue
+    else:
+        form = ProductForm(instance=product)
+
+    return render(request, 'shop/edit_product.html', {'form': form})
+
+
+""" Methode pour supprimer un produit quand on est l'administrateur """
+def delete_product(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    product.delete()
+    return redirect('index')
+
+
+""" Methode pour afficher tous les produit en base """
 def index(request):
     print(request.user)
     product_object = Product.objects.all()
@@ -48,13 +68,7 @@ def index(request):
     
     total_prix = 0
     order_user = Order.objects.all()
-    
-    print("-------------------------------------")
-    print(request.user)
-    print(type(request.user))
-    print("-------------------------------------")
-
-    
+        
     if not request.user.is_anonymous:
         order_user = Order.objects.filter(user=request.user)
     
@@ -66,11 +80,10 @@ def index(request):
     return render(request, 'shop/index.html', {'product_object': product_object, "order_user":order_user, "total" : total_prix})
 
 
-
+""" Methode pour afficher le details du produit en base """
 def detail(request, myid):
     product_object = Product.objects.get(id=myid)
     return render(request, 'shop/detail.html', {'product': product_object}) 
-
 
 
 def checkout(request):
@@ -88,7 +101,7 @@ def checkout(request):
     return render(request, 'shop/checkout.html', {"order_user":order_user, "total" : total_prix}) 
 
 
-
+""" Methode pour gérer la création d'un compte utilisateur """
 def create_account_user(request):
     if request.method == "POST":
         key = generate(seed = 101)
@@ -134,39 +147,34 @@ def create_account_user(request):
         return render(request, 'shop/create_user.html', {"form":  UserForm}) #UserCreationForm, 
 
 
-
+""" Methode pour afficher la page de l'utilisateur une fois connecter """
 def account_user(request):
     return render(request, "shop/account_user.html")
 
 
-
+""" Methode pour déconnecter l'utilisateur """
 def logout_account_user(request):
     logout(request)
     return redirect("connexion_compte")
 
 
-
+""" Methode pour savoir combien de produit l'utilisateur a dans son panier """
 def get_number_product_in_cart(request):
     if request.method == "POST":
         number_cart = request.POST.get("panier_product_quantity")
         nb_product = int(list(request.POST.keys())[0])
-        request.session["nb"] = int(list(request.POST.keys())[0])
-        print("-----------------------------------------------------")
-        print("Votre session a bien été créer")
-        print("-----------------------------------------------------")
         return JsonResponse({ 'status': 'success', 'number_cart': int(list(request.POST.keys())[0]), })
 
 
 
-
+""" Methode pour connecter l'utilisateur """
 def login_account_user(request):
-    if request.method == "POST" and request.user:
+    if request.method == "POST" :
         username = request.POST['username']
         password = request.POST['password']
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            ######
             order_user = Order.objects.filter(user=request.user)
             total_prix = 0
             for order in order_user:
@@ -178,7 +186,7 @@ def login_account_user(request):
     return render(request, "shop/login.html", {"form":form})
     
 
-
+""" Methode pour ajouter un produit dans le panier """
 def add_cart(request, myid):
     user = request.user
     product = get_object_or_404(Product, id=myid)
@@ -194,7 +202,7 @@ def add_cart(request, myid):
     return redirect("index")
 
 
-
+""" Methode pour supprimer les produits dans le panier """
 def delete_cart(request):
     if cart := request.user.cart:
         cart.orders.all().delete()
@@ -202,7 +210,7 @@ def delete_cart(request):
     return redirect("index")
 
 
-
+""" Methode pour supprimer les produits dans le panier """
 def delete_cart_by_id(request, id):
     if cart := request.user.cart:
         cart.orders.filter(id=id).delete()
@@ -210,25 +218,25 @@ def delete_cart_by_id(request, id):
     return redirect("index")
 
 
-
+""" Methode pour supprimer les produits dans le panier pour l'utilisateur non connecté """
 def delete_cart_by_id_no_connect(request, id):
     Cart.orders.filter(id=id).delete()
     Cart.delete()
     return redirect("index")
 
 
-
+""" Methode pour afficher la page de confirmation de commande """
 def confimation(request):
     info = Product.objects.all()[:1]
     return render(request, 'shop/confirmation.html')          
 
 
-
+""" Methode pour afficher la page de paiement """
 def payment(request):
     return render(request, 'shop/payment.html')          
 
 
-
+""" Methode pour afficher la page de succèes de paiement """
 def success_payment(request):
     key = generate(seed = 101)
     print(key.get_key())

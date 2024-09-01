@@ -1,5 +1,5 @@
 from django.urls import path
-from shop.views import home, index, detail, success_payment, get_number_product_in_cart, create_product ,checkout, logout_account_user, add_cart, payment, confimation, create_account_user, account_user, login_account_user, delete_cart, delete_cart_by_id
+from shop.views import home, index, edit_product, delete_product, detail, success_payment, get_number_product_in_cart, create_product ,checkout, logout_account_user, add_cart, payment, confimation, create_account_user, account_user, login_account_user, delete_cart, delete_cart_by_id
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -8,7 +8,9 @@ urlpatterns = [
     path('billeterie/', index, name='index'),
     path('billeterie/create_product', create_product, name='create_product'),
     path('billeterie/<int:myid>', detail, name="detail"),
+    path('billeterie/product/<int:product_id>', edit_product, name="edit"),
     path('billeterie/add_cart/<int:myid>', add_cart, name="add_cart"),
+    path('billeterie/delete/<int:product_id>/', delete_product, name='delete'),
     path('billeterie/checkout', checkout, name="checkout"),
     path('billeterie/confirmation', confimation, name="confirmation" ),
     path('billeterie/creation_compte', create_account_user, name="creation_compte" ),

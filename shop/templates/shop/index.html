@@ -27,8 +27,8 @@
                     <div id="aa{{ product.id }}" class="card-title">{{ product.title }}</div>
                     <div id="price{{ product.id }}" style="color:orange" class="card-text"> {{ product.price }}</div>
                     {% if user.is_superuser %}
-                    <a href="{{ product.id }}" class="btn btn-warning">Modifer</a>
-                    <a href="add_cart/{{ product.id }}" class="btn ted btn-danger">Supprimer</a>
+                    <a href="product/{{ product.id }}" class="btn btn-warning">Modifer</a>
+                    <a href="delete/{{ product.id }}" class="btn ted btn-danger">Supprimer</a>
                     {% else %}
                         <a href="{{ product.id }}" class="btn btn-warning">Détails</a>
                         <a href="add_cart/{{ product.id }}" class="btn ted btn-success">Ajouter au panier</a>
@@ -105,7 +105,7 @@
                             <div class="card-body">
                                 <div id="aa{{ product.id }}" class="card-title">{{ product.title }}</div>
                                 <div id="price{{ product.id }}" style="color:orange" class="card-text"> {{ product.price }}</div>
-                                {% comment %} <a href="#" class="btn btn-warning">Détails</a> {% endcomment %}
+                                <a href="{{ product.id }}" class="btn btn-warning">Détails</a>
                                 <a 
                                     href="#" 
                                     onclick="ajouterAuPanier({{ product.id }}, '{{ product.title }}', {{ product.price }})" 
