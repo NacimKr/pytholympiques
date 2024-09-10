@@ -236,7 +236,7 @@ def payment(request):
     return render(request, 'shop/payment.html')          
 
 
-""" Methode pour afficher la page de succèes de paiement """
+""" Methode pour afficher la page de succèes de """
 def success_payment(request):
     key = generate(seed = 101)
     print(key.get_key())
