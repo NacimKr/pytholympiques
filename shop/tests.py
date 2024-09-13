@@ -186,3 +186,37 @@ class TestCaseLogout(TestCase):
       self.assertEqual(response_logout.status_code, 302)
       
       self.assertRedirects(response_logout, reverse("connexion_compte"), 302)
+      
+      
+class TestCaseBillets(TestCase):
+  
+  def setUp(self):
+    self.data_auth = {
+      "username" : "test",
+      "password1" : "test",
+      "password2" : "test",
+      "email" : "test@gmail.com"
+    }
+    
+    self.user_connect = User.objects.create_user(self.data_auth)
+    
+    #On utilise un client pour tester le formulaire pour simuler les vues 
+    #Comme si on était dans un navigateur
+    
+    #On instancie le client
+    self.client = Client()
+    
+    
+  def test_billet_page_billetterie(self):
+    url_billeterie = reverse("index")
+    
+    response_to_billeterie = self.client.get(url_billeterie)
+
+    #On verifie qu'on est bien dans l'url de commande de billeterie
+    self.assertEqual(response_to_billeterie.status_code, 200)
+    
+    
+    
+    
+
+    
