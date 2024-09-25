@@ -27,8 +27,12 @@
                     <div id="aa{{ product.id }}" class="card-title">{{ product.title }}</div>
                     <div id="price{{ product.id }}" style="color:orange" class="card-text"> {{ product.price }}</div>
                     {% if user.is_superuser %}
+
+
                     <a href="product/{{ product.id }}" class="btn btn-warning">Modifer</a>
-                    <a href="delete/{{ product.id }}" class="btn ted btn-danger">Supprimer</a>
+                    <a onclick="modalForDelete('{{ product.title }}', {{ product.id }})" class="btn ted btn-danger deleteModal">Supprimer</a>
+
+                    {% comment %} href="delete/{{ product.id }}" {% endcomment %}
                     {% else %}
                         <a href="{{ product.id }}" class="btn btn-warning">Détails</a>
                         <a href="add_cart/{{ product.id }}" class="btn ted btn-success">Ajouter au panier</a>
@@ -144,10 +148,10 @@
                 </div>
 
                 {% if not user.is_superuser %}
-                <div>
-                    <h4>Votre panier</h4>
-                    <div id="panier"></div>
-                </div>
+                    <div>
+                        <h4>Votre panier</h4>
+                        <div id="panier"></div>
+                    </div>
                 {% endif %}
 
 
@@ -184,6 +188,17 @@
         // Afficher le panier mis à jour
         afficherPanier();
     }
+
+
+    function modalForDelete(name, id){
+        let confirmModal = confirm("Etez-vous sur de vouloir supprimer le billet"+name)
+        if(confirmModal){
+            window.location.href = "delete/"+id;
+        }else{
+            return;
+        }
+    }
+
 
     // Fonction pour afficher le panier
     function afficherPanier() {
